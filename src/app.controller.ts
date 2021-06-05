@@ -7,8 +7,5 @@ export class AppController {
     return 'Hello World!';
   }
 
-  @Get('world') //http://localhost:3000/world/
-  getWorld(): string {
-    return 'World!';
-  }
+
 }
