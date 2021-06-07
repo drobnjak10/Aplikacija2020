@@ -10,12 +10,12 @@ export class AppController {
     private administratorService: AdministratorService
   ) { }
 
-  @Get() //http://localhost:3000/
+  @Get() // http://localhost:3000/
   getHello(): string {
     return 'Hello World!';
   }
 
-  @Get('api/administrator')
+  @Get('api/administrator') // http://localhost:3000/api/administrator
   getAllAdmins(): Promise<Administrator[]> {
      return this.administratorService.getAll();
   }
