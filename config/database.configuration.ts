@@ -4,3 +4,4 @@ export const DatabaseConfiguration = {
     password: 'aplikacija',
     database: 'application'
 };
+
