@@ -24,6 +24,7 @@ import { AuthMiddleware } from './middlwares/auth.middleware';
 import { PhotoService } from './services/photo/photo.service';
 import { FeatureService } from './services/feature/feature.service';
 import { FeatureController } from './controllers/api/feature.controller';
+import { UserService } from './services/user/user.service';
 
 @Module({
   imports: [
@@ -48,10 +49,10 @@ import { FeatureController } from './controllers/api/feature.controller';
         User
       ]
     }),
-    TypeOrmModule.forFeature([ Administrator, Category, Article, ArticlePrice, ArticleFeature, Photo, Feature ])
+    TypeOrmModule.forFeature([ Administrator, Category, Article, ArticlePrice, ArticleFeature, Photo, Feature, User ])
   ],
   controllers: [AppController, AdministratorController, CategoryController, ArticleController, AuthController, FeatureController],
-  providers: [AdministratorService, CategoryService, ArticleService, PhotoService, FeatureService],
+  providers: [AdministratorService, CategoryService, ArticleService, PhotoService, FeatureService, UserService],
 
 })
 export class AppModule implements NestModule {
