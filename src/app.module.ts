@@ -15,13 +15,15 @@ import { Photo } from 'src/entities/photo.entity';
 import { User } from 'src/entities/user.entity';
 import { Administrator } from 'src/entities/administrator.entity';
 import { AdministratorController } from './controllers/api/administrator.controller';
-import { CategoryService } from './services/category/category.administrator';
+import { CategoryService } from './services/category/category.service';
 import { CategoryController } from './controllers/api/category.controller';
 import { ArticleService } from './services/article/article.service';
 import { ArticleController } from './controllers/api/article.controller';
 import { AuthController } from './controllers/api/auth.controller';
 import { AuthMiddleware } from './middlwares/auth.middleware';
 import { PhotoService } from './services/photo/photo.service';
+import { FeatureService } from './services/feature/feature.service';
+import { FeatureController } from './controllers/api/feature.controller';
 
 @Module({
   imports: [
@@ -46,10 +48,10 @@ import { PhotoService } from './services/photo/photo.service';
         User
       ]
     }),
-    TypeOrmModule.forFeature([ Administrator, Category, Article, ArticlePrice, ArticleFeature, Photo ])
+    TypeOrmModule.forFeature([ Administrator, Category, Article, ArticlePrice, ArticleFeature, Photo, Feature ])
   ],
-  controllers: [AppController, AdministratorController, CategoryController, ArticleController, AuthController],
-  providers: [AdministratorService, CategoryService, ArticleService, PhotoService],
+  controllers: [AppController, AdministratorController, CategoryController, ArticleController, AuthController, FeatureController],
+  providers: [AdministratorService, CategoryService, ArticleService, PhotoService, FeatureService],
 
 })
 export class AppModule implements NestModule {
