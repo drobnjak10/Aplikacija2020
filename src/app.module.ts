@@ -53,6 +53,7 @@ import { UserService } from './services/user/user.service';
   ],
   controllers: [AppController, AdministratorController, CategoryController, ArticleController, AuthController, FeatureController],
   providers: [AdministratorService, CategoryService, ArticleService, PhotoService, FeatureService, UserService],
+  exports: [AdministratorService, UserService]
 
 })
 export class AppModule implements NestModule {
