@@ -27,6 +27,7 @@ import { FeatureController } from './controllers/api/feature.controller';
 import { UserService } from './services/user/user.service';
 import { CartService } from './services/cart/cart.service';
 import { UserCartController } from './controllers/api/user.cart.controller';
+import { OrderService } from './services/order/order.service';
 
 @Module({
   imports: [
@@ -54,7 +55,7 @@ import { UserCartController } from './controllers/api/user.cart.controller';
     TypeOrmModule.forFeature([ Administrator, Category, Article, ArticlePrice, ArticleFeature, Photo, Feature, User, Cart, Order, CartArticle ])
   ],
   controllers: [AppController, AdministratorController, CategoryController, ArticleController, AuthController, FeatureController, UserCartController],
-  providers: [AdministratorService, CategoryService, ArticleService, PhotoService, FeatureService, UserService, CartService],
+  providers: [AdministratorService, CategoryService, ArticleService, PhotoService, FeatureService, UserService, CartService, OrderService],
   exports: [AdministratorService, UserService]
 
 })
