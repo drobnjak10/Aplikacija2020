@@ -1,13 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { TypeOrmCrudService } from "@nestjsx/crud-typeorm";
+import { type } from "os";
 import { AddArticleDto } from "src/dtos/article/add.article.dto";
+import { ArticleSearchDto } from "src/dtos/article/article.search.dto";
 import { EditArticleDto } from "src/dtos/article/edit.article.dto";
 import { ArticleFeature } from "src/entities/article-feature.entity";
 import { ArticlePrice } from "src/entities/article-price.entity";
 import { Article } from "src/entities/article.entity";
 import { ApiResponse } from "src/misc/api.response.class";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 
 @Injectable()
 export class ArticleService extends TypeOrmCrudService<Article>{
@@ -123,4 +125,83 @@ export class ArticleService extends TypeOrmCrudService<Article>{
 
     }
 
+    async search(data: ArticleSearchDto): Promise<Article[]> {
+        const builder = await this.article.createQueryBuilder("article");
+
+        builder.innerJoinAndSelect("article.articlePrices", "aPrice", 
+                            "aPrice.createdAt = (SELECT MAX(aPrice.created_at) FROM article_price AS aPrice WHERE aPrice.article_id = article.article_id)"); // aPrice alias
+        builder.leftJoinAndSelect("article.articleFeatures", "aFeature");
+
+        builder.where("article.categoryId = :categoryId", { categoryId: data.categoryId });
+
+        if(data.keywords && data.keywords.length > 0) {
+            builder.andWhere(`(article.name LIKE :keyword OR 
+                               article.excerpt LIKE :keyword OR 
+                               article.description LIKE :keyword)`, 
+                                { keyword: '%' + data.keywords.trim() + '%'}); // LIKE = bilo sta
+        }
+
+        if(data.priceMin && typeof data.priceMin === 'number') {
+            builder.andWhere("aPrice.price >= :min", { min: data.priceMin });
+        }
+
+        if(data.priceMax && typeof data.priceMax === 'number') {
+            builder.andWhere("aPrice.price <= :max", { max: data.priceMax });
+        }
+
+        if(data.features && data.features.length > 0) {
+            for(const feature of data.features) {
+                builder.andWhere("aFeature.featureId = :featureId AND aFeature.value IN(:fValues)", 
+                { featureId: feature.featureId, fValues: feature.values })
+            }
+        }
+
+        let orderBy = 'article.name';
+        let orderDirection: 'ASC' | 'DESC' = 'ASC';
+
+        if(data.orderBy) {
+            orderBy = data.orderBy;
+
+            if(orderBy === 'price') {
+                orderBy = 'aPrice.price'; 
+            }
+
+            if(orderBy === 'name') {
+                orderBy = 'article.name'; 
+            }
+        }
+
+        if(data.orderDirection) {
+            orderDirection = data.orderDirection;
+        }
+
+        builder.orderBy(orderBy, orderDirection);
+        
+        let page = 0;
+        let perPage: 5 | 10 | 25 | 50 | 75 = 25;
+        
+        if(data.page && typeof data.page === 'number') {
+            page = data.page;
+        }
+
+        if(data.itemsPerPage && typeof data.itemsPerPage === 'number') {
+            perPage = data.itemsPerPage;
+        }
+        
+        builder.skip(page * perPage);
+        builder.take(perPage);
+
+        let itemIds = await (await builder.getMany()).map(article => { article.articleId });
+
+        return await this.article.find({
+            where: { articleId: In(itemIds) },
+            relations: [
+                "category",
+                "articleFeatures",
+                "features",
+                "articlePrices"
+            ]
+        });
+        
+     }
 }

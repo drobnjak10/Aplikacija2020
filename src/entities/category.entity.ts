@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { Article } from "./article.entity";
 import { Feature } from "./feature.entity";
+import * as Validator from "class-validator"
 
 @Index("uq_category_name", ["name"], { unique: true })
 @Index("uq_category_image_path", ["imagePath"], { unique: true })
@@ -23,6 +24,10 @@ export class Category {
     length: 32,
     default: () => "'0'",
   })
+  @Validator.IsNotEmpty()
+  @Validator.IsString()
+  @Validator.Length(5, 32)
+  // @Validator.Matches(/^[A-Z][a-z]{1,31}$/)
   name: string;
 
   @Column("varchar", {
@@ -31,6 +36,9 @@ export class Category {
     length: 128,
     default: () => "'0'",
   })
+  @Validator.IsNotEmpty()
+  @Validator.IsString()
+  @Validator.Length(1, 128)
   imagePath: string;
 
   @Column("int", {

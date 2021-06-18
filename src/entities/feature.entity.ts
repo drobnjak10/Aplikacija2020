@@ -12,6 +12,8 @@ import {
 import { ArticleFeature } from "./article-feature.entity";
 import { Article } from "./article.entity";
 import { Category } from "./category.entity";
+import * as Validator from "class-validator"
+
 
 @Index("uq_feature_name_category_id", ["name", "categoryId"], { unique: true })
 @Index("fk_feature_category_id", ["categoryId"], {})
@@ -21,6 +23,10 @@ export class Feature {
   featureId: number;
 
   @Column("varchar", { length: 64, default: () => "'0'" })
+  @Validator.IsNotEmpty()
+  @Validator.IsString()
+  @Validator.Length(5, 32)
+  // @Validator.Matches(/^[A-Z][a-z]{1,31}$/)
   name: string;
 
   @Column("int", { name: "category_id", unsigned: true, default: () => "'0'" })
