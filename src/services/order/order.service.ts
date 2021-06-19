@@ -6,6 +6,7 @@ import { CartArticle } from 'src/entities/cart-article.entity';
 import { Article } from 'src/entities/article.entity';
 import { Order } from 'src/entities/order.entity';
 import { ApiResponse } from 'src/misc/api.response.class';
+import { ChangeOrderStatusDto } from 'src/dtos/order/change.order.status.dto';
 
 @Injectable()
 export class OrderService {
@@ -44,7 +45,12 @@ export class OrderService {
 
         const savedOrder = await this.order.save(newOrder);
 
-        return await this.order.findOne(savedOrder.orderId, {
+        return await this.getById(savedOrder.orderId);
+        
+    }
+    
+    async getById(id: number): Promise<Order> {
+        return await this.order.findOne(id, {
             relations: [
                 "cart",
                 "cart.user",
@@ -53,8 +59,21 @@ export class OrderService {
                 "cart.cartArticles.article.category",
                 "cart.cartArticles.article.articlePrices"
             ]
-        })
+        });  
+    }
+
+    async changeStatus(id: number, newStatus: "rejected" | "accepted" | "shipped" | "pending") {
+        const order = await this.getById(id);
+
+        if(!order) {
+            return new ApiResponse('error', -9002, 'Cannnot change order status.');
+        }
         
+        order.status = newStatus;
+
+        await this.order.save(order);
+        
+        return await this.getById(id);
     }
     
 }
